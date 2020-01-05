@@ -191,6 +191,8 @@ void	poll_buttons()
 
 			case SET_STAT:
 				g_print_stats = !g_print_stats;
+				if (!g_print_stats)
+					TV.draw_rect(20, 10, 92, 6, 0, 0);
 				break;
 
 			case SET_TRIGGER:
