@@ -17,6 +17,7 @@
 # define	PIN_MODE				4
 
 # define	PIN_CH1					0
+# define	PIN_TRIGGER				2
 
 # define	BTN_REFRESH_INTERVAL	10000
 # define	MENU_REFRESH_INTERVAL	100000

@@ -3,26 +3,6 @@
 #include "TVout_DSO_values.h"
 #include "TVout_DSO.h"
 
-// Varlables de memorisation de l'etat des boutons
-boolean					g_btn_scale_pressed;
-boolean					g_btn_sample_pressed;
-boolean					g_restart_acquisition;
-
-// Variables d'etat des boutons
-unsigned char			g_button_set;
-unsigned char			g_button_plus;
-unsigned char			g_button_mode;
-
-// Variables globales de parametrages
-boolean					g_print_stats;
-unsigned int			g_trigger_value;
-volatile boolean		g_trigger_run;
-volatile unsigned long	g_sample_time;
-
-int						g_min_value; // TODO use volatile for single acquisition
-int						g_max_value;
-long					g_avg_value;
-
 void	setup()
 {
 	// set prescale to 16 -> clkADC = 1MHz -> reduces acquisition time to 13us (from 100us)
@@ -52,7 +32,7 @@ void	setup()
 	g_voltage_scale = (1024 / GFX_GRAPH_HEIGHT) + 1;
 	g_echeance_mesure = micros();
 	g_echeance_btn = micros();
-	g_trigger_value = 200;
+	g_trigger_value = analogRead(PIN_TRIGGER);
 	g_trigger_run = false;
 	g_print_stats = false;
 	g_fast_mode = false;
@@ -65,8 +45,8 @@ void	setup()
 
 	// Init of timings for 20kSa/s acquisition
 	g_sampling_mode = SAMPLING_20K;
-	g_time_division = sampling_fast_values[SAMPLING_20K];
-	g_ecart_mesure = sampling_values[SAMPLING_20K];
+	g_time_division = k_sampling_fast_values[SAMPLING_20K];
+	g_ecart_mesure = k_sampling_values[SAMPLING_20K];
 
 	// Init TV
 	TV.begin(NTSC, 120, 96);
@@ -100,56 +80,56 @@ void	change_time_scale()
 	{
 		case 0:
 			g_sampling_mode = 1;
-			g_time_division = sampling_fast_values[1];
-			g_ecart_mesure = sampling_values[1];
+			g_time_division = k_sampling_fast_values[1];
+			g_ecart_mesure = k_sampling_values[1];
 			break;
 
 		case 1:
 			g_sampling_mode = 2;
-			g_time_division = sampling_fast_values[2];
-			g_ecart_mesure = sampling_values[2];
+			g_time_division = k_sampling_fast_values[2];
+			g_ecart_mesure = k_sampling_values[2];
 			break;
 
 		case 2:
 			g_sampling_mode = 3;
-			g_time_division = sampling_fast_values[3];
-			g_ecart_mesure = sampling_values[3];
+			g_time_division = k_sampling_fast_values[3];
+			g_ecart_mesure = k_sampling_values[3];
 			break;
 
 		case 3:
 			g_sampling_mode = 4;
-			g_time_division = sampling_fast_values[4];
-			g_ecart_mesure = sampling_values[4];
+			g_time_division = k_sampling_fast_values[4];
+			g_ecart_mesure = k_sampling_values[4];
 			break;
 
 		case 4:
 			g_sampling_mode = 5;
-			g_time_division = sampling_fast_values[5];
-			g_ecart_mesure = sampling_values[5];
+			g_time_division = k_sampling_fast_values[5];
+			g_ecart_mesure = k_sampling_values[5];
 			break;
 
 		case 5:
 			g_sampling_mode = 6;
-			g_time_division = sampling_fast_values[6];
-			g_ecart_mesure = sampling_values[6];
+			g_time_division = k_sampling_fast_values[6];
+			g_ecart_mesure = k_sampling_values[6];
 			break;
 
 		case 6:
 			g_sampling_mode = 7;
-			g_time_division = sampling_fast_values[7];
-			g_ecart_mesure = sampling_values[7];
+			g_time_division = k_sampling_fast_values[7];
+			g_ecart_mesure = k_sampling_values[7];
 			break;
 
 		case 7:
 			g_sampling_mode = 8;
-			g_time_division = sampling_fast_values[8];
-			g_ecart_mesure = sampling_values[8];
+			g_time_division = k_sampling_fast_values[8];
+			g_ecart_mesure = k_sampling_values[8];
 			break;
 
 		case 8:
 			g_sampling_mode = 0;
-			g_time_division = sampling_fast_values[0];
-			g_ecart_mesure = sampling_values[0];
+			g_time_division = k_sampling_fast_values[0];
+			g_ecart_mesure = k_sampling_values[0];
 			break;
 	}
 	gfx_clear_graph();
@@ -219,12 +199,12 @@ void	poll_buttons()
 
 void	print_mode()
 {
-	TV.print(2, 2, g_run_mode_str[g_run_mode]);
+	TV.print(2, 2, k_run_mode_str[g_run_mode]);
 }
 
 void	print_setting()
 {
-	TV.print(32, 2, g_setting_str[g_setting]);
+	TV.print(42, 2, k_setting_str[g_setting]);
 }
 
 void	print_stats()
@@ -239,7 +219,7 @@ void	print_stats()
 
 void	print_sample_rate()
 {
-	TV.print(64, 2, (unsigned int)(((unsigned long)GFX_GRAPH_WIDTH * 1000000UL) / g_sample_time), 10);
+	TV.print(78, 2, (unsigned int)(((unsigned long)GFX_GRAPH_WIDTH * 1000000UL) / g_sample_time), 10);
 	TV.print(" Sa/s  ");
 }
 
@@ -250,7 +230,6 @@ void	print_menu()
 	print_sample_rate();
 	if (g_print_stats == true)
 		print_stats();
-	// TODO fall print stats
 }
 
 void	acq_measure()
@@ -343,9 +322,4 @@ void	loop()
 		delay(500UL);
 	}
 }
-
-
-
-
-
 
