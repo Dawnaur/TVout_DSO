@@ -30,6 +30,7 @@ unsigned int			g_time_division;
 volatile unsigned int	g_time_iteration;
 unsigned int			g_ecart_mesure;
 volatile unsigned long	g_echeance_mesure;
+volatile unsigned long	g_echeance_btn;
 volatile unsigned int	g_measure_column;
 int						g_offset;
 int						g_voltage_scale;

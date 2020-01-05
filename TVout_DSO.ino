@@ -6,7 +6,7 @@
 // Varlables de memorisation de l'etat des boutons
 boolean					g_btn_scale_pressed;
 boolean					g_btn_sample_pressed;
-boolean					g_hscale_changed;
+boolean					g_restart_acquisition;
 
 // Variables d'etat des boutons
 unsigned char			g_button_set;
@@ -15,14 +15,13 @@ unsigned char			g_button_mode;
 
 // Variables globales de parametrages
 boolean					g_print_stats;
-boolean					g_trigger_value;
+unsigned int			g_trigger_value;
 volatile boolean		g_trigger_run;
 volatile unsigned long	g_sample_time;
 
 int						g_min_value; // TODO use volatile for single acquisition
 int						g_max_value;
 long					g_avg_value;
-
 
 void	setup()
 {
@@ -45,13 +44,14 @@ void	setup()
 	// Init events
 	g_btn_scale_pressed = false;
 	g_btn_sample_pressed = false;
-	g_hscale_changed = false;
+	g_restart_acquisition = false;
 
 	// Init settings
 	g_run_mode = MODE_RUN;
 	g_setting = SET_STAT;
 	g_voltage_scale = (1024 / GFX_GRAPH_HEIGHT) + 1;
 	g_echeance_mesure = micros();
+	g_echeance_btn = micros();
 	g_trigger_value = 200;
 	g_trigger_run = false;
 	g_print_stats = false;
@@ -180,13 +180,13 @@ void	poll_buttons()
 		switch (g_setting)
 		{
 			case SET_VSCALE:
-				g_hscale_changed = true; // vscale // TODO restart acquisition
+				g_restart_acquisition = true;
 				change_voltage_scale();
 				break;
 
 			case SET_HSCALE:
 				change_time_scale();
-				g_hscale_changed = true;
+				g_restart_acquisition = true;
 				break;
 
 			case SET_STAT:
@@ -207,9 +207,10 @@ void	poll_buttons()
 		}
 		else
 		{
-			g_run_mode = MODE_RUN;
 			g_fast_mode = false;
+			g_run_mode = MODE_RUN;
 		}
+		g_restart_acquisition = true;
 	}
 }
 
@@ -272,11 +273,16 @@ void	acq_measure()
 				while (time > g_echeance_mesure)
 					g_echeance_mesure += g_ecart_mesure;
 			}
-			if (g_measure_column >= GFX_GRAPH_WIDTH)
+			if (g_measure_column >= GFX_GRAPH_WIDTH || g_restart_acquisition)
 			{
 				g_trigger_run = false;
-				if (g_run_mode == MODE_SINGLE)
+				if (g_run_mode == MODE_SINGLE && !g_restart_acquisition)
 					g_run_mode = MODE_HOLD;
+				if (g_restart_acquisition)
+				{
+					g_measure_column = GFX_GRAPH_WIDTH;
+					g_restart_acquisition = 0;
+				}
 				detachInterrupt(digitalPinToInterrupt(2));
 			}
 		}
@@ -288,21 +294,31 @@ void	loop()
 	unsigned int	i;
 	unsigned int	val = 0;
 	unsigned int	old_val = 0;
+	unsigned long	time;
 
 	g_measure_column = 0;
 	if (g_run_mode != MODE_HOLD)
 	{
 		while (g_measure_column < GFX_GRAPH_WIDTH)
 		{
+			time = micros();
+			if (time > g_echeance_btn)
+			{
+				poll_buttons();
+				while (time > g_echeance_btn)
+					g_echeance_btn += 10000;
+				if (g_restart_acquisition)
+					g_trigger_run = false;
+			}
 			if (g_trigger_run == false)
 			{
 				old_val = val;
 				val = analogRead(PIN_CH1);
-				// Trigger not working right now
 				if (old_val < g_trigger_value && val >= g_trigger_value) // ajouter timeout en mode run
 				{
 					g_trigger_run = true;
 					g_time_iteration = 0;
+					g_measure_column = 0;
 					g_start_time = micros();
 					g_min_value = 1023;
 					g_max_value = 0;
@@ -322,7 +338,7 @@ void	loop()
 	while (i++ < 10)
 	{
 		poll_buttons();
-		delay(1000UL);
+		delay(500UL);
 	}
 }
 
