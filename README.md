@@ -25,6 +25,11 @@ You only need the 20kHz for fast single acquisition.
 Fast single acquisition will use interrupts from an external pin to prevent cuts from acquisition.
 This will also disturb video signal for the time of acquisition.
 
+## License
+
+Project under MIT License.
+https://opensource.org/licenses/MIT
+
 ## History
 The first goal of this project is a challenge proposed by Electrobidouilleur:
 https://www.youtube.com/watch?v=GWkLWGPdXKE

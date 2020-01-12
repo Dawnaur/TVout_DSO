@@ -1,3 +1,21 @@
+/******************************************************************************/
+/*        ________                                                            */
+/*        \______ \  _____  __  _  __ ____  _____    __ __ _______            */
+/*         |    |  \ \__  \ \ \/ \/ //    \ \__  \  |  |  \\_  __ \           */
+/*         |    `   \ / __ \_\     /|   |  \ / __ \_|  |  / |  | \/           */
+/*        /_______  /(____  / \/\_/ |___|  /(____  /|____/  |__|              */
+/*                \/      \/             \/      \/                           */
+/*                                                                            */
+/* Project:        TVout_DSO                                                  */
+/* File:           TVout_DSO.ino                                              */
+/* Started:        dec. 2019                                                  */
+/* Last updated:   12 jan. 2020                                               */
+/* License:        MIT (https://opensource.org/licenses/MIT)                  */
+/* Comment:        Project started with a challenge from ElectroBidouilleur,  */
+/*                 highly inspired from Wullschj's project                    */
+/*                                                                            */
+/******************************************************************************/
+
 #include <TVout.h>
 #include <fontALL.h>
 #include "TVout_DSO_values.h"
