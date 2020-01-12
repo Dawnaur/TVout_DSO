@@ -214,18 +214,17 @@ void	poll_buttons()
 	}
 }
 
-
-void	print_mode()
+static void	print_mode()
 {
 	TV.print(2, 2, k_run_mode_str[g_run_mode]);
 }
 
-void	print_setting()
+static void	print_setting()
 {
 	TV.print(42, 2, k_setting_str[g_setting]);
 }
 
-void	print_stats()
+static void	print_stats()
 {
 	TV.print(20, 10, CONVERT_TO_VOLT(g_avg_value / GFX_GRAPH_WIDTH), 2);
 	TV.print("V ("); 
@@ -235,7 +234,7 @@ void	print_stats()
 	TV.print("V)"); 
 }
 
-void	print_sample_rate()
+static void	print_sample_rate()
 {
 	TV.print(78, 2, (unsigned int)(((unsigned long)GFX_GRAPH_WIDTH * 1000000UL) / g_sample_time), 10);
 	TV.print(" Sa/s  ");

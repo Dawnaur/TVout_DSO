@@ -50,7 +50,7 @@
 # define	SAMPLING_100			7
 # define	SAMPLING_NB				8
 
-// définie la zone graphique
+// Graphical area
 # define	GFX_RES_X				128
 # define	GFX_RES_Y				96
 # define	GFX_GRAPH_OFFSET_X		18
