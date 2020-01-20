@@ -76,9 +76,9 @@ int						g_offset;
 int						g_voltage_scale;
 
 // Stats
-int						g_min_value; // TODO use volatile for single acquisition
-int						g_max_value;
-long					g_avg_value;
+volatile unsigned int	g_min_value; // TODO use volatile for single acquisition
+volatile unsigned int	g_max_value;
+volatile long			g_avg_value;
 
 // Values and strings tables
 const char				k_run_mode_str[][7] = {"RUN   ", "SINGLE", "HOLD  "};
@@ -105,16 +105,16 @@ void	gfx_draw_v_scale();
 void	change_voltage_scale();
 
 /* Change time scale by delaying acquisitions */
-void	change_time_scale()
+void	change_time_scale();
 
 /* Check changes on buttons */
-void	poll_buttons()
+void	poll_buttons();
 
 /* Prints menu with mode, informations, and settings */
-void	print_menu()
+void	print_menu();
 
 /* Launch an acquisition and draw the result */
-void	acq_measure()
+void	acq_measure();
 
 /* Refresh the column by removing old pixel and putting the new one */
 void	gfx_refresh_column(int i, int val);
