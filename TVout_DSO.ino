@@ -84,7 +84,26 @@ void	setup()
 	gfx_clear_graph();
 	gfx_draw_v_scale();
 	print_menu();
+}
 
+static void	update_trigger(void)
+{
+	static int	old_trigger_y = 42;
+	int			trigger_y;
+
+	g_trigger_value = analogRead(PIN_TRIGGER);
+	trigger_y = gfx_compute_y(g_trigger_value);
+	TV.draw_rect(GFX_GRAPH_OFFSET_X + GFX_GRAPH_WIDTH + 1, old_trigger_y - 2, 3, 5, 0, 0);
+	gfx_pixel_put(GFX_GRAPH_OFFSET_X + GFX_GRAPH_WIDTH + 1, trigger_y, 1);
+	gfx_pixel_put(GFX_GRAPH_OFFSET_X + GFX_GRAPH_WIDTH + 2, trigger_y - 1, 1);
+	gfx_pixel_put(GFX_GRAPH_OFFSET_X + GFX_GRAPH_WIDTH + 2, trigger_y, 1);
+	gfx_pixel_put(GFX_GRAPH_OFFSET_X + GFX_GRAPH_WIDTH + 2, trigger_y + 1, 1);
+	gfx_pixel_put(GFX_GRAPH_OFFSET_X + GFX_GRAPH_WIDTH + 3, trigger_y - 2, 1);
+	gfx_pixel_put(GFX_GRAPH_OFFSET_X + GFX_GRAPH_WIDTH + 3, trigger_y - 1, 1);
+	gfx_pixel_put(GFX_GRAPH_OFFSET_X + GFX_GRAPH_WIDTH + 3, trigger_y, 1);
+	gfx_pixel_put(GFX_GRAPH_OFFSET_X + GFX_GRAPH_WIDTH + 3, trigger_y + 1, 1);
+	gfx_pixel_put(GFX_GRAPH_OFFSET_X + GFX_GRAPH_WIDTH + 3, trigger_y + 2, 1);
+	old_trigger_y = trigger_y;
 }
 
 void	change_voltage_scale()
@@ -375,7 +394,7 @@ void	loop()
 	while (i++ < 2)
 	{
 		poll_buttons();
-		g_trigger_value = analogRead(PIN_TRIGGER);
+		update_trigger();
 		delay(500UL);
 	}
 }
