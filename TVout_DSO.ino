@@ -21,6 +21,16 @@
 #include "TVout_DSO_values.h"
 #include "TVout_DSO.h"
 
+extern	char *__brkval;
+
+unsigned int	get_free_memory(void)
+{
+	char	top;
+
+	return ((unsigned int)(&top - __brkval));
+}
+unsigned int g_free_mem;
+
 void	setup()
 {
 	// set prescale to 16 -> clkADC = 1MHz -> reduces acquisition time to 13us (from 100us)
@@ -67,11 +77,13 @@ void	setup()
 	g_ecart_mesure = k_sampling_values[SAMPLING_20K];
 
 	// Init TV
-	TV.begin(NTSC, 120, 96);
+	TV.begin(NTSC, GFX_RES_X, GFX_RES_Y);
 	TV.select_font(font4x6);
 
 	gfx_clear_graph();
 	gfx_draw_v_scale();
+	print_menu();
+
 }
 
 void	change_voltage_scale()
@@ -226,7 +238,7 @@ static void	print_setting()
 
 static void	print_stats()
 {
-	TV.print(20, 10, CONVERT_TO_VOLT(g_avg_value / GFX_GRAPH_WIDTH), 2);
+	TV.print(20, 8, CONVERT_TO_VOLT(g_avg_value / GFX_GRAPH_WIDTH), 2);
 	TV.print("V ("); 
 	TV.print(CONVERT_TO_VOLT(g_min_value), 2);
 	TV.print("V-"); 
@@ -234,10 +246,18 @@ static void	print_stats()
 	TV.print("V)"); 
 }
 
+
 static void	print_sample_rate()
 {
 	TV.print(78, 2, (unsigned int)(((unsigned long)GFX_GRAPH_WIDTH * 1000000UL) / g_sample_time), 10);
 	TV.print(" Sa/s  ");
+}
+
+/* only for debug purposes */
+static void	print_free_memory()
+{
+	TV.print(78, 2, g_free_mem, 10);
+	TV.print(" Octets");
 }
 
 void	print_menu()
@@ -245,8 +265,7 @@ void	print_menu()
 	print_mode();
 	print_setting();
 	print_sample_rate();
-	if (g_print_stats == true)
-		print_stats();
+	print_stats();
 }
 
 void	acq_measure()
@@ -266,6 +285,7 @@ void	acq_measure()
 			g_min_value = g_min_value < val ? g_min_value : val;
 			g_max_value = g_max_value > val ? g_max_value : val;
 			g_avg_value += val;
+			g_free_mem = get_free_memory();
 			if (g_fast_mode == false)
 			{
 				while (time > g_echeance_mesure)
@@ -290,13 +310,15 @@ void	acq_measure()
 void	loop()
 {
 	unsigned int	i;
-	unsigned int	val = 0;
+	unsigned int	val;
 	unsigned int	old_val = 0;
 	unsigned long	time;
 
 	g_measure_column = 0;
 	if (g_run_mode != MODE_HOLD)
 	{
+		val = analogRead(PIN_CH1);
+		old_val = val;
 		while (g_measure_column < GFX_GRAPH_WIDTH)
 		{
 			time = micros();
@@ -311,16 +333,20 @@ void	loop()
 			if (g_trigger_run == false)
 			{
 				old_val = val;
+				g_start_time = micros();
 				val = analogRead(PIN_CH1);
+				g_trigger_value = analogRead(PIN_TRIGGER);
 				if (old_val < g_trigger_value && val >= g_trigger_value) // ajouter timeout en mode run
 				{
 					g_trigger_run = true;
 					g_time_iteration = 0;
-					g_measure_column = 0;
-					g_start_time = micros();
-					g_min_value = 1023;
-					g_max_value = 0;
-					g_avg_value = 0;
+					g_measure_column = 1;
+					gfx_refresh_column(0, val);
+					g_measure_column++;
+					g_min_value = val;
+					g_max_value = val;
+					g_avg_value = val;
+					g_echeance_mesure = g_start_time;
 					if (g_fast_mode)
 						attachInterrupt(digitalPinToInterrupt(2), acq_measure, RISING);
 				}
@@ -328,6 +354,7 @@ void	loop()
 			else if (g_fast_mode == false)
 				acq_measure();
 		}
+		g_trigger_run = false;
 		g_sample_time = (micros() - g_start_time);
 		print_menu();
 	}
@@ -336,6 +363,7 @@ void	loop()
 	while (i++ < 10)
 	{
 		poll_buttons();
+		g_trigger_value = analogRead(PIN_TRIGGER);
 		delay(500UL);
 	}
 }

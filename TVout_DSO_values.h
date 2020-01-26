@@ -51,12 +51,12 @@
 # define	SAMPLING_NB				8
 
 // Graphical area
-# define	GFX_RES_X				128
+# define	GFX_RES_X				120
 # define	GFX_RES_Y				96
 # define	GFX_GRAPH_OFFSET_X		18
 # define	GFX_GRAPH_OFFSET_Y		94
-# define	GFX_GRAPH_WIDTH			100
-# define	GFX_GRAPH_HEIGHT		86
+# define	GFX_GRAPH_WIDTH			96
+# define	GFX_GRAPH_HEIGHT		80
 # define	GFX_GRAPH_UPPER_LIMIT	(GFX_GRAPH_OFFSET_Y + 1)
 # define	GFX_GRAPH_LOWER_LIMIT	(GFX_GRAPH_OFFSET_Y - GFX_GRAPH_HEIGHT)
 # define	GFX_SCALE_FACTOR		((1024 / GFX_GRAPH_HEIGHT) + 1)
