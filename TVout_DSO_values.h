@@ -9,7 +9,7 @@
 /* Project:        TVout_DSO                                                  */
 /* File:           TVout_DSO_values.h                                         */
 /* Started:        dec. 2019                                                  */
-/* Last updated:   12 jan. 2020                                               */
+/* Last updated:   26 jan. 2020                                               */
 /* License:        MIT (https://opensource.org/licenses/MIT)                  */
 /* Comment:        Project started with a challenge from ElectroBidouilleur,  */
 /*                 highly inspired from Wullschj's project                    */
