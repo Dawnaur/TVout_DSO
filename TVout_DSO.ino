@@ -284,19 +284,24 @@ void	acq_measure()
 	{
 		if (++g_time_iteration >= g_time_division)
 		{
+			g_echeance_mesure += g_ecart_mesure;
+			while (time > g_echeance_mesure)
+			{
+				g_echeance_mesure += g_ecart_mesure;
+				++g_measure_column;
+				g_min_value = g_min_value < val ? g_min_value : val;
+				g_max_value = g_max_value > val ? g_max_value : val;
+				g_avg_value += val;
+			}
 			g_time_iteration = 0;
 			val = analogRead(PIN_CH1);
-			gfx_refresh_column(g_measure_column, val);
-			g_measure_column++;
+			if (g_measure_column < GFX_GRAPH_WIDTH)
+				gfx_refresh_column(g_measure_column, val);
+			++g_measure_column;
 			g_min_value = g_min_value < val ? g_min_value : val;
 			g_max_value = g_max_value > val ? g_max_value : val;
 			g_avg_value += val;
 			g_free_mem = get_free_memory();
-			if (g_fast_mode == false)
-			{
-				while (time > g_echeance_mesure)
-					g_echeance_mesure += g_ecart_mesure;
-			}
 			if (g_measure_column >= GFX_GRAPH_WIDTH || g_restart_acquisition)
 			{
 				g_trigger_run = false;
@@ -367,7 +372,7 @@ void	loop()
 	}
 
 	i = 0;
-	while (i++ < 10)
+	while (i++ < 2)
 	{
 		poll_buttons();
 		g_trigger_value = analogRead(PIN_TRIGGER);
