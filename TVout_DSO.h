@@ -71,6 +71,7 @@ volatile unsigned int	g_run_mode;
 boolean					g_print_stats;
 unsigned int			g_trigger_value;
 volatile boolean		g_trigger_run;
+boolean					g_trigger_edge;
 volatile unsigned long	g_sample_time;
 int						g_offset;
 int						g_voltage_scale;
@@ -82,7 +83,7 @@ volatile long			g_avg_value;
 
 // Values and strings tables
 const char				k_run_mode_str[][7] = {"RUN   ", "SINGLE", "HOLD  "};
-const char				k_setting_str[][8] = {"V SCALE", "H SCALE", " TRIG  ", " STAT  "};
+const char				k_setting_str[][8] = {"V SCALE", "H SCALE", "TRIGGER", " STAT  "};
 const int				k_sampling_values[] = {100UL, 100UL, 200UL, 500UL, 1000UL, 2000UL, 5000UL, 10000UL, 20000UL};
 const int				k_sampling_fast_values[] = {1, 2, 4, 10, 20, 40, 100, 200, 400};
 

@@ -62,6 +62,7 @@ void	setup()
 	g_echeance_btn = micros();
 	g_trigger_value = analogRead(PIN_TRIGGER);
 	g_trigger_run = false;
+	g_trigger_edge = TRIGGER_RISING_EDGE;
 	g_print_stats = false;
 	g_fast_mode = false;
 
@@ -206,6 +207,7 @@ void	poll_buttons()
 				break;
 
 			case SET_TRIGGER:
+				g_trigger_edge = !g_trigger_edge;
 				break;
 		}
 	}
@@ -233,7 +235,11 @@ static void	print_mode()
 
 static void	print_setting()
 {
-	TV.print(42, 2, k_setting_str[g_setting]);
+	TV.print(32, 2, k_setting_str[g_setting]);
+	if (g_setting == SET_TRIGGER)
+		TV.print(g_trigger_edge == TRIGGER_RISING_EDGE ? " /" : " \\");
+	else
+		TV.print("  ");
 }
 
 static void	print_stats()
@@ -336,7 +342,8 @@ void	loop()
 				g_start_time = micros();
 				val = analogRead(PIN_CH1);
 				g_trigger_value = analogRead(PIN_TRIGGER);
-				if (old_val < g_trigger_value && val >= g_trigger_value) // ajouter timeout en mode run
+				if ((g_trigger_edge == TRIGGER_RISING_EDGE && (old_val < g_trigger_value && val >= g_trigger_value)) || 
+					(g_trigger_edge == TRIGGER_FALLING_EDGE && (old_val > g_trigger_value && val <= g_trigger_value))) // ajouter timeout en mode run
 				{
 					g_trigger_run = true;
 					g_time_iteration = 0;
